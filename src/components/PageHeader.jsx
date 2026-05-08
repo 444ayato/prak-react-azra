@@ -7,10 +7,12 @@ export default function PageHeader({ title, breadcrumb, children }) {
           <span>Dashboard</span>
           <span>/</span>
           <span className="text-green-500 font-bold">
+            {/* Mendukung string atau array sesuai instruksi */}
             {Array.isArray(breadcrumb) ? breadcrumb.join(" / ") : breadcrumb}
           </span>
         </div>
       </div>
+      {/* Menampilkan tombol "Add" yang dikirim sebagai children */}
       <div>{children}</div>
     </div>
   );

@@ -1,32 +1,50 @@
 import { Routes, Route } from 'react-router-dom';
-import Sidebar from './layouts/Sidebar';
-import Header from './layouts/Header';
-import Dashboard from './pages/Dashboard';
-import Orders from './pages/Orders';
-import Customers from './pages/Customers';
-import ErrorPage from './pages/ErrorPage';
+import React, { Suspense } from 'react';
+//import Dashboard from './pages/Dashboard';
+//import Orders from './pages/Orders';
+//import Customers from './pages/Customers';
+//import ErrorPage from './pages/ErrorPage';
+//import MainLayout from './layouts/MainLayout';
+//import Login from './pages/auth/Login';
+//import Register from './pages/auth/Register';
+//import Forgot from './pages/auth/Forgot';
+//import AuthLayout from './layouts/AuthLayout';
+
+const Dashboard = React.lazy(() => import("./pages/Dashboard"))
+const Orders = React.lazy(() => import("./pages/Orders"))
+const Customers = React.lazy(() => import("./pages/Customers"))
+const ErrorPage = React.lazy(() => import("./pages/ErrorPage"))
+const MainLayout = React.lazy(() => import("./layouts/MainLayout"))
+const AuthLayout = React.lazy(() => import("./layouts/AuthLayout"))
+const Login = React.lazy(() => import("./pages/auth/Login"))
+const Register = React.lazy(() => import("./pages/auth/Register"))
+const Forgot = React.lazy(() => import("./pages/auth/Forgot"))
+const Loading = React.lazy(() => import("./components/Loading"))
 
 function App() {
   return (
-    <div className="bg-gray-50 min-h-screen flex">
-      <Sidebar />
-      <div className="flex-1 p-6">
-        <Header />
+    <Suspense fallback={<Loading />}>
         <Routes>
+          <Route element={<MainLayout />}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/orders" element={<Orders />} />
           <Route path="/customers" element={<Customers />} />
 
-          {/* Rute Latihan Error Dinamis */}
-          <Route path="/error-400" element={<ErrorPage code="400" description="Permintaan tidak valid (Bad Request)." image="/img/error-400.png" />} />
-          <Route path="/error-401" element={<ErrorPage code="401" description="Anda tidak terautorisasi (Unauthorized)." image="/img/error-401.png" />} />
-          <Route path="/error-403" element={<ErrorPage code="403" description="Akses dilarang (Forbidden)." image="/img/error-403.png" />} />
+          {/* Rute Latihan Error dari Dosen */}
+          <Route path="/error-400" element={<ErrorPage code="400" description="Bad Request. Permintaan tidak valid." image="/img/error-400.png" />} />
+          <Route path="/error-401" element={<ErrorPage code="401" description="Unauthorized. Anda tidak memiliki akses." image="/img/error-401.png" />} />
+          <Route path="/error-403" element={<ErrorPage code="403" description="Forbidden. Akses halaman ini dilarang." image="/img/error-403.png" />} />
           
-          {/* Default 404 */}
+          {/* Wildcard Route untuk 404 - Harus di paling bawah */}
           <Route path="*" element={<ErrorPage code="404" description="Halaman tidak ditemukan." image="/img/error-404.png" />} />
+          </Route>
+          <Route element={<AuthLayout/>}>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register/>} />
+            <Route path="/forgot" element={<Forgot/>} />
+        </Route>
         </Routes>
-      </div>
-    </div>
+      </Suspense>
   );
 }
 export default App;

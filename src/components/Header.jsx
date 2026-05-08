@@ -38,7 +38,7 @@ export default function Header() {
                 {/* Profile Section */}
                 <div className="flex items-center space-x-4 border-l pl-4 border-gray-300 ml-2">
                     <span className="text-sm text-gray-600">
-                        Hello, <b className="text-gray-900">Fikri Muhaffizh</b>
+                        Hello, <b className="text-gray-900">Muhammad Rafi Al-zikri</b>
                     </span>
                     <img
                         className="w-10 h-10 rounded-full object-cover border border-gray-200 shadow-sm"
