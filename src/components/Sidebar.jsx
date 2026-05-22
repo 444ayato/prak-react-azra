@@ -1,5 +1,11 @@
 import { NavLink } from 'react-router-dom'; 
-import { MdSpaceDashboard, MdOutlineShoppingCart, MdOutlinePeopleAlt, MdErrorOutline } from "react-icons/md";
+import { 
+  MdSpaceDashboard, 
+  MdOutlineShoppingCart, 
+  MdOutlinePeopleAlt, 
+  MdOutlineInventory2, // Tambahkan icon untuk produk
+  MdErrorOutline 
+} from "react-icons/md";
 
 export default function Sidebar() {
   // Fungsi menuClass untuk mengatur state aktif dan hover pada menu
@@ -40,6 +46,14 @@ export default function Sidebar() {
             <NavLink id="menu-customers" to="/customers" className={menuClass}>
               <MdOutlinePeopleAlt className="mr-2 text-xl" /> 
               <span>Customers</span>
+            </NavLink>
+          </li>
+
+          {/* Menu Baru: Products */}
+          <li>
+            <NavLink id="menu-products" to="/products" className={menuClass}>
+              <MdOutlineInventory2 className="mr-2 text-xl" /> 
+              <span>Products</span>
             </NavLink>
           </li>
           

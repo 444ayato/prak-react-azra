@@ -13,6 +13,7 @@ import React, { Suspense } from 'react';
 const Dashboard = React.lazy(() => import("./pages/Dashboard"))
 const Orders = React.lazy(() => import("./pages/Orders"))
 const Customers = React.lazy(() => import("./pages/Customers"))
+const Produk = React.lazy(() => import("./pages/Produk"))
 const ErrorPage = React.lazy(() => import("./pages/ErrorPage"))
 const MainLayout = React.lazy(() => import("./layouts/MainLayout"))
 const AuthLayout = React.lazy(() => import("./layouts/AuthLayout"))
@@ -20,6 +21,7 @@ const Login = React.lazy(() => import("./pages/auth/Login"))
 const Register = React.lazy(() => import("./pages/auth/Register"))
 const Forgot = React.lazy(() => import("./pages/auth/Forgot"))
 const Loading = React.lazy(() => import("./components/Loading"))
+const ProductDetail = React.lazy(() => import("./pages/ProductDetail"))
 
 function App() {
   return (
@@ -29,6 +31,8 @@ function App() {
           <Route path="/" element={<Dashboard />} />
           <Route path="/orders" element={<Orders />} />
           <Route path="/customers" element={<Customers />} />
+          <Route path="/products" element={<Produk />} />
+          <Route path="/products/:id" element={<ProductDetail />} /> 
 
           {/* Rute Latihan Error dari Dosen */}
           <Route path="/error-400" element={<ErrorPage code="400" description="Bad Request. Permintaan tidak valid." image="/img/error-400.png" />} />
