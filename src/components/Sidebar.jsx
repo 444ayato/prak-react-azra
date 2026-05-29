@@ -3,12 +3,12 @@ import {
   MdSpaceDashboard, 
   MdOutlineShoppingCart, 
   MdOutlinePeopleAlt, 
-  MdOutlineInventory2, // Tambahkan icon untuk produk
+  MdOutlineInventory2,
+  MdOutlineCategory, // 1. Impor ikon kategori/komponen di sini
   MdErrorOutline 
 } from "react-icons/md";
 
 export default function Sidebar() {
-  // Fungsi menuClass untuk mengatur state aktif dan hover pada menu
   const menuClass = ({ isActive }) =>
     `flex cursor-pointer items-center rounded-xl p-4 space-x-2 transition-all ${
       isActive ? 
@@ -56,6 +56,14 @@ export default function Sidebar() {
               <span>Products</span>
             </NavLink>
           </li>
+
+          {/* Menu Baru: Components (Playground) */}
+          <li>
+            <NavLink id="menu-components" to="/components" className={menuClass}>
+              <MdOutlineCategory className="mr-2 text-xl" /> 
+              <span>Components</span>
+            </NavLink>
+          </li>
           
           {/* Section Latihan Error */}
           <div className="pt-6 pb-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-4">
@@ -85,7 +93,6 @@ export default function Sidebar() {
       {/* Bottom Section: Profile Card */}
       <div className="mt-auto pt-10">
         <div className="bg-green-500 rounded-2xl p-4 text-white flex items-center shadow-lg relative overflow-hidden">
-          {/* Dekorasi kecil untuk card profile */}
           <div className="absolute -right-2 -top-2 w-12 h-12 bg-white/10 rounded-full"></div>
           
           <div className="text-xs flex-1 z-10">

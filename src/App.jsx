@@ -14,6 +14,7 @@ const Dashboard = React.lazy(() => import("./pages/Dashboard"))
 const Orders = React.lazy(() => import("./pages/Orders"))
 const Customers = React.lazy(() => import("./pages/Customers"))
 const Produk = React.lazy(() => import("./pages/Produk"))
+const Components = React.lazy(() => import("./pages/Components")) // 1. Tambahkan lazy import di sini
 const ErrorPage = React.lazy(() => import("./pages/ErrorPage"))
 const MainLayout = React.lazy(() => import("./layouts/MainLayout"))
 const AuthLayout = React.lazy(() => import("./layouts/AuthLayout"))
@@ -27,26 +28,30 @@ function App() {
   return (
     <Suspense fallback={<Loading />}>
         <Routes>
+          {/* Rute di dalam MainLayout (Memakai Sidebar dan Header) */}
           <Route element={<MainLayout />}>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/orders" element={<Orders />} />
-          <Route path="/customers" element={<Customers />} />
-          <Route path="/products" element={<Produk />} />
-          <Route path="/products/:id" element={<ProductDetail />} /> 
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/orders" element={<Orders />} />
+            <Route path="/customers" element={<Customers />} />
+            <Route path="/products" element={<Produk />} />
+            <Route path="/products/:id" element={<ProductDetail />} /> 
+            <Route path="/components" element={<Components />} /> {/* 2. Selipkan route playground di sini */}
 
-          {/* Rute Latihan Error dari Dosen */}
-          <Route path="/error-400" element={<ErrorPage code="400" description="Bad Request. Permintaan tidak valid." image="/img/error-400.png" />} />
-          <Route path="/error-401" element={<ErrorPage code="401" description="Unauthorized. Anda tidak memiliki akses." image="/img/error-401.png" />} />
-          <Route path="/error-403" element={<ErrorPage code="403" description="Forbidden. Akses halaman ini dilarang." image="/img/error-403.png" />} />
-          
-          {/* Wildcard Route untuk 404 - Harus di paling bawah */}
-          <Route path="*" element={<ErrorPage code="404" description="Halaman tidak ditemukan." image="/img/error-404.png" />} />
+            {/* Rute Latihan Error dari Dosen */}
+            <Route path="/error-400" element={<ErrorPage code="400" description="Bad Request. Permintaan tidak valid." image="/img/error-400.png" />} />
+            <Route path="/error-401" element={<ErrorPage code="401" description="Unauthorized. Anda tidak memiliki akses." image="/img/error-401.png" />} />
+            <Route path="/error-403" element={<ErrorPage code="403" description="Forbidden. Akses halaman ini dilarang." image="/img/error-403.png" />} />
+            
+            {/* Wildcard Route untuk 404 - Harus di paling bawah */}
+            <Route path="*" element={<ErrorPage code="404" description="Halaman tidak ditemukan." image="/img/error-404.png" />} />
           </Route>
+
+          {/* Rute tanpa Sidebar/Header */}
           <Route element={<AuthLayout/>}>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register/>} />
             <Route path="/forgot" element={<Forgot/>} />
-        </Route>
+          </Route>
         </Routes>
       </Suspense>
   );
