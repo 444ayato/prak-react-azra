@@ -65,6 +65,14 @@ export default function Sidebar() {
             </NavLink>
           </li>
           
+          {/* Ubah bagian ini agar tombol menu bisa ditekan dan aktif dengan benar */}
+          <li>
+            <NavLink id="menu-xyz" to="/fitur-xyz" className={menuClass}>
+              <MdOutlineCategory className="mr-2 text-xl"/> 
+              <span>Fitur XYZ</span>
+            </NavLink>
+          </li>
+          
           {/* Section Latihan Error */}
           <div className="pt-6 pb-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-4">
             Latihan Error

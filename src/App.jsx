@@ -23,6 +23,7 @@ const Register = React.lazy(() => import("./pages/auth/Register"))
 const Forgot = React.lazy(() => import("./pages/auth/Forgot"))
 const Loading = React.lazy(() => import("./components/Loading"))
 const ProductDetail = React.lazy(() => import("./pages/ProductDetail"))
+const FiturXyz = React.lazy(() => import("./pages/FiturXyz"))
 
 function App() {
   return (
@@ -36,7 +37,7 @@ function App() {
             <Route path="/products" element={<Produk />} />
             <Route path="/products/:id" element={<ProductDetail />} /> 
             <Route path="/components" element={<Components />} /> {/* 2. Selipkan route playground di sini */}
-
+            <Route path="/fitur-xyz" element={<FiturXyz />} /> {/* 3. Tambahkan route untuk halaman FiturXyz */}
             {/* Rute Latihan Error dari Dosen */}
             <Route path="/error-400" element={<ErrorPage code="400" description="Bad Request. Permintaan tidak valid." image="/img/error-400.png" />} />
             <Route path="/error-401" element={<ErrorPage code="401" description="Unauthorized. Anda tidak memiliki akses." image="/img/error-401.png" />} />
