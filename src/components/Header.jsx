@@ -24,16 +24,6 @@ export default function Header() {
                         50
                     </span>
                 </div>
-                
-                {/* Chart Icon */}
-                <div className="p-3 bg-blue-100 rounded-2xl cursor-pointer hover:bg-blue-200 transition-colors">
-                    <FcAreaChart size={20} />
-                </div>
-                
-                {/* Settings Icon */}
-                <div className="p-3 bg-red-100 rounded-2xl text-red-500 cursor-pointer hover:bg-red-200 transition-colors">
-                    <SlSettings size={20} />
-                </div>
 
                 {/* Profile Section */}
                 <div className="flex items-center space-x-4 border-l pl-4 border-gray-300 ml-2">
