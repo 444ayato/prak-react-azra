@@ -1,50 +1,76 @@
-import { FaShoppingCart, FaTruck, FaBan, FaDollarSign, FaStar } from "react-icons/fa";
+import { useState, useEffect } from "react";
+import { supabase } from "../services/supabaseClient";
 import PageHeader from "../components/PageHeader";
 import RecentOrders from "../components/RecentOrders";
+import { Loader2, ShoppingBag, Truck, Ban, DollarSign, Star } from "lucide-react";
 
 export default function Dashboard() {
+  const [stats, setStats] = useState({ total: 0, completed: 0, cancelled: 0, revenue: 0 });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      const { data, error } = await supabase.from("orders").select("status, total_amount");
+      if (!error && data) {
+        setStats({
+          total: data.length,
+          completed: data.filter((o) => o.status === "completed").length,
+          cancelled: data.filter((o) => o.status === "cancelled").length,
+          revenue: data
+            .filter((o) => o.status === "completed")
+            .reduce((sum, o) => sum + Number(o.total_amount), 0),
+        });
+      }
+      setLoading(false);
+    };
+    fetchStats();
+  }, []);
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 pb-10">
       <PageHeader />
 
       {/* Stats Section */}
       <div className="p-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-        <StatCard icon={<FaShoppingCart />} count="75" label="Total Orders" color="bg-green-500" />
-        <StatCard icon={<FaTruck />} count="175" label="Total Delivered" color="bg-blue-500" />
-        <StatCard icon={<FaBan />} count="40" label="Total Canceled" color="bg-red-500" />
-        <StatCard icon={<FaDollarSign />} count="Rp.128k" label="Total Revenue" color="bg-yellow-500" />
+        {loading ? (
+          <div className="col-span-4 flex justify-center py-8"><Loader2 className="w-6 h-6 animate-spin text-green-500" /></div>
+        ) : (
+          <>
+            <StatCard icon={<ShoppingBag className="w-6 h-6" />} count={String(stats.total)} label="Total Orders" color="bg-green-500" />
+            <StatCard icon={<Truck className="w-6 h-6" />} count={String(stats.completed)} label="Completed" color="bg-blue-500" />
+            <StatCard icon={<Ban className="w-6 h-6" />} count={String(stats.cancelled)} label="Canceled" color="bg-red-500" />
+            <StatCard icon={<DollarSign className="w-6 h-6" />} count={`Rp${(stats.revenue / 1000).toFixed(0)}k`} label="Revenue" color="bg-yellow-500" />
+          </>
+        )}
       </div>
 
       <div className="p-5 grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* NEW 1: Recent Orders Table */}
         <div className="lg:col-span-2">
           <RecentOrders />
         </div>
 
         <div className="flex flex-col gap-6">
-          {/* NEW 2: Latest Review with Hirono Profile */}
           <div className="bg-white p-6 rounded-xl shadow-md">
             <h2 className="text-lg font-bold mb-4">Latest Review</h2>
             <div className="flex items-center space-x-4 mb-3">
               <img src="/img/hirono.jpg" className="w-12 h-12 rounded-full object-cover border" alt="User" />
               <div>
                 <p className="font-bold">Anisa Rahma</p>
-                <div className="flex text-yellow-400 text-xs"><FaStar /><FaStar /><FaStar /><FaStar /><FaStar /></div>
+                <div className="flex text-yellow-400 text-xs"><Star className="w-3 h-3 fill-current" /><Star className="w-3 h-3 fill-current" /><Star className="w-3 h-3 fill-current" /><Star className="w-3 h-3 fill-current" /><Star className="w-3 h-3 fill-current" /></div>
               </div>
             </div>
             <p className="text-gray-500 text-sm italic">"Makanannya enak banget, pengirimannya juga cepet banget! Bakal langganan terus."</p>
           </div>
 
-          {/* NEW 3: Target Progress Bar */}
           <div className="bg-white p-6 rounded-xl shadow-md border-t-4 border-green-500">
             <h2 className="text-lg font-bold mb-2">Weekly Target</h2>
-            <p className="text-sm text-gray-400 mb-4">85% of goals reached.</p>
+            <p className="text-sm text-gray-400 mb-4">{stats.total > 0 ? `${Math.round((stats.completed / stats.total) * 100)}% of orders completed` : "No data yet"}</p>
             <div className="w-full bg-gray-100 rounded-full h-4 overflow-hidden">
-              <div className="bg-green-500 h-full w-[85%] transition-all duration-500"></div>
+              <div className="bg-green-500 h-full transition-all duration-500" style={{ width: `${stats.total > 0 ? (stats.completed / stats.total) * 100 : 0}%` }}></div>
             </div>
             <div className="flex justify-between mt-2 text-[10px] font-bold text-gray-400">
               <span>0%</span>
-              <span className="text-green-600">85% ACHIEVED</span>
+              <span className="text-green-600">{stats.total > 0 ? `${Math.round((stats.completed / stats.total) * 100)}%` : "-"}</span>
               <span>100%</span>
             </div>
           </div>

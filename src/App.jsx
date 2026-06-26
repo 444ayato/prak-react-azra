@@ -1,20 +1,15 @@
 import { Routes, Route } from 'react-router-dom';
-import React, { Suspense } from 'react';
-//import Dashboard from './pages/Dashboard';
-//import Orders from './pages/Orders';
-//import Customers from './pages/Customers';
-//import ErrorPage from './pages/ErrorPage';
-//import MainLayout from './layouts/MainLayout';
-//import Login from './pages/auth/Login';
-//import Register from './pages/auth/Register';
-//import Forgot from './pages/auth/Forgot';
-//import AuthLayout from './layouts/AuthLayout';
+import React, { Suspense, useEffect } from 'react';
+import { Toaster } from './components/ui/sonner';
+import ProtectedRoute from './components/ProtectedRoute';
+import { useAuth } from './contexts/AuthContext';
 
 const Dashboard = React.lazy(() => import("./pages/Dashboard"))
+const MemberDashboard = React.lazy(() => import("./pages/member/Dashboard"))
 const Orders = React.lazy(() => import("./pages/Orders"))
 const Customers = React.lazy(() => import("./pages/Customers"))
 const Produk = React.lazy(() => import("./pages/Produk"))
-const Components = React.lazy(() => import("./pages/Components")) // 1. Tambahkan lazy import di sini
+const Components = React.lazy(() => import("./pages/Components"))
 const ErrorPage = React.lazy(() => import("./pages/ErrorPage"))
 const MainLayout = React.lazy(() => import("./layouts/MainLayout"))
 const AuthLayout = React.lazy(() => import("./layouts/AuthLayout"))
@@ -25,38 +20,66 @@ const Loading = React.lazy(() => import("./components/Loading"))
 const ProductDetail = React.lazy(() => import("./pages/ProductDetail"))
 const FiturXyz = React.lazy(() => import("./pages/FiturXyz"))
 const Note = React.lazy(() => import("./pages/Note"))
+const Checkout = React.lazy(() => import("./pages/member/Checkout"))
+const MyOrders = React.lazy(() => import("./pages/member/MyOrders"))
+
+// ─── Dynamic Home Route: Admin → Dashboard, Member → MemberDashboard ───
+function HomeRoute() {
+  const { isAdmin, loading, refreshProfile, user } = useAuth();
+
+  // Refresh profile setiap kali halaman dimuat (sinkron dengan database)
+  useEffect(() => {
+    if (user) refreshProfile();
+  }, []);
+
+  if (loading) return <Loading />;
+  return isAdmin ? <Dashboard /> : <MemberDashboard />;
+}
 
 function App() {
   return (
-    <Suspense fallback={<Loading />}>
+    <>
+      <Toaster richColors position="top-right" />
+      <Suspense fallback={<Loading />}>
         <Routes>
-          {/* Rute di dalam MainLayout (Memakai Sidebar dan Header) */}
-          <Route element={<MainLayout />}>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/orders" element={<Orders />} />
-            <Route path="/customers" element={<Customers />} />
-            <Route path="/products" element={<Produk />} />
-            <Route path="/products/:id" element={<ProductDetail />} /> 
-            <Route path="/components" element={<Components />} /> {/* 2. Selipkan route playground di sini */}
-            <Route path="/fitur-xyz" element={<FiturXyz />} /> {/* 3. Tambahkan route untuk halaman FiturXyz */}
-            <Route path="/note" element={<Note />} /> {/* 4. Tambahkan route untuk halaman Note (buat file Note.jsx di folder pages) */}
-            {/* Rute Latihan Error dari Dosen */}
-            <Route path="/error-400" element={<ErrorPage code="400" description="Bad Request. Permintaan tidak valid." image="/img/error-400.png" />} />
-            <Route path="/error-401" element={<ErrorPage code="401" description="Unauthorized. Anda tidak memiliki akses." image="/img/error-401.png" />} />
-            <Route path="/error-403" element={<ErrorPage code="403" description="Forbidden. Akses halaman ini dilarang." image="/img/error-403.png" />} />
-            
-            {/* Wildcard Route untuk 404 - Harus di paling bawah */}
-            <Route path="*" element={<ErrorPage code="404" description="Halaman tidak ditemukan." image="/img/error-404.png" />} />
-          </Route>
-
-          {/* Rute tanpa Sidebar/Header */}
+          {/* ── RUTE AUTH (tanpa sidebar) ── */}
           <Route element={<AuthLayout/>}>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register/>} />
             <Route path="/forgot" element={<Forgot/>} />
           </Route>
+
+          {/* ── RUTE TERPROTEKSI (dengan sidebar & header) ── */}
+          <Route element={<ProtectedRoute />}>
+            <Route element={<MainLayout />}>
+              {/* Dynamic home based on role */}
+              <Route path="/" element={<HomeRoute />} />
+              
+              {/* Member routes */}
+              <Route path="/my-orders" element={<MyOrders />} />
+              <Route path="/checkout" element={<Checkout />} />
+
+              {/* Khusus Admin */}
+              <Route element={<ProtectedRoute requiredRole="admin" />}>
+                <Route path="/orders" element={<Orders />} />
+                <Route path="/customers" element={<Customers />} />
+                <Route path="/products" element={<Produk />} />
+                <Route path="/products/:id" element={<ProductDetail />} /> 
+                <Route path="/components" element={<Components />} />
+                <Route path="/fitur-xyz" element={<FiturXyz />} />
+                <Route path="/note" element={<Note />} />
+                <Route path="/error-400" element={<ErrorPage code="400" description="Bad Request. Permintaan tidak valid." />} />
+                <Route path="/error-401" element={<ErrorPage code="401" description="Unauthorized. Anda tidak memiliki akses." />} />
+                <Route path="/error-403" element={<ErrorPage code="403" description="Forbidden. Akses halaman ini dilarang." />} />
+              </Route>
+
+              {/* Wildcard 404 */}
+              <Route path="*" element={<ErrorPage code="404" description="Halaman tidak ditemukan." />} />
+            </Route>
+          </Route>
         </Routes>
       </Suspense>
+    </>
   );
 }
 export default App;

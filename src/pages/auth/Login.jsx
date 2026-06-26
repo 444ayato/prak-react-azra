@@ -1,120 +1,129 @@
-import axios from "axios";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-// Tambahkan import icon di bawah ini (pastikan sudah install react-icons)
-import { BsFillExclamationDiamondFill } from "react-icons/bs";
-import { ImSpinner2 } from "react-icons/im";
+import { Link, useNavigate, Navigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertTriangle, Loader2, Eye, EyeOff, LogIn } from "lucide-react";
 
 export default function Login() {
-  /* navigate, state & handleChange */
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [dataForm, setDataForm] = useState({
-    email: "", 
-    password: "", 
-  });
+  const { login, loading, user } = useAuth();
+  const [dataForm, setDataForm] = useState({ email: "", password: "" });
+  const [showPassword, setShowPassword] = useState(false);
+  const [localError, setLocalError] = useState("");
 
   const handleChange = (evt) => {
     const { name, value } = evt.target;
-    setDataForm({
-      ...dataForm,
-      [name]: value,
-    });
+    setDataForm((prev) => ({ ...prev, [name]: value }));
+    if (localError) setLocalError("");
   };
 
-  /* process form */
+  // Redirect jika sudah login
+  if (user) return <Navigate to="/" replace />;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLocalError("");
 
-    setLoading(true);
-    setError(""); // Reset error jadi string kosong, bukan false
+    if (!dataForm.email || !dataForm.password) {
+      setLocalError("Silakan isi email dan password terlebih dahulu.");
+      return;
+    }
 
-    axios
-      .post("https://dummyjson.com/auth/login", { // Endpoint dummyjson yang benar biasanya /auth/login
-        username: dataForm.email,
-        password: dataForm.password,
-      })
-      .then((response) => {
-        if (response.status !== 200) {
-          setError(response.data.message);
-          return;
-        }
-        // Redirect ke dashboard jika login sukses
-        navigate("/");
-      })
-      .catch((err) => {
-        if (err.response) {
-          setError(err.response.data.message || "An error occurred");
-        } else {
-          setError(err.message || "An unknown error occurred");
-        }
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    const result = await login(dataForm.email, dataForm.password);
+    if (result.success) {
+      navigate("/", { replace: true });
+    }
   };
 
-  /* error & loading status - Sekarang diletakkan di dalam fungsi Login */
-  const errorInfo = error ? (
-    <div className="bg-red-200 mb-5 p-5 text-sm font-light text-gray-600 rounded flex items-center">
-      <BsFillExclamationDiamondFill className="text-red-600 me-2 text-lg" />
-      {error}
-    </div>
-  ) : null;
-
-  const loadingInfo = loading ? (
-    <div className="bg-gray-200 mb-5 p-5 text-sm rounded flex items-center">
-      <ImSpinner2 className="me-2 animate-spin" />
-      Mohon Tunggu...
-    </div>
-  ) : null;
-
-  /* Return sekarang berada di dalam scope fungsi Login */
   return (
     <div>
-      <h2 className="text-2xl font-semibold text-gray-700 mb-6 text-center">
+      <h2 className="text-2xl font-semibold text-gray-700 mb-1 text-center">
         Welcome Back 👋
       </h2>
+      <p className="text-sm text-gray-400 text-center mb-6">
+        Masuk ke akun Sedap Anda
+      </p>
 
-      {errorInfo}
-      {loadingInfo}
+      {localError && (
+        <Alert variant="destructive" className="mb-5">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription>{localError}</AlertDescription>
+        </Alert>
+      )}
 
-      <form onSubmit={handleSubmit}>
-        <div className="mb-5">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Email Address (Username)
+      <form onSubmit={handleSubmit} noValidate>
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-1.5">
+            Email Address
           </label>
           <input
             name="email"
+            type="email"
+            value={dataForm.email}
             onChange={handleChange}
-            type="text"
-            id="email"
-            className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400"
-            placeholder="emilys" // Contoh username dummyjson
+            autoComplete="email"
+            className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl shadow-sm placeholder-gray-400 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all"
+            placeholder="you@example.com"
           />
         </div>
+
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-gray-700 mb-1.5">
             Password
           </label>
-          <input
-            name="password"
-            onChange={handleChange}
-            type="password"
-            id="password"
-            className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400"
-            placeholder="********"
-          />
+          <div className="relative">
+            <input
+              name="password"
+              type={showPassword ? "text" : "password"}
+              value={dataForm.password}
+              onChange={handleChange}
+              autoComplete="current-password"
+              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl shadow-sm placeholder-gray-400 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all pr-10"
+              placeholder="********"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </button>
+          </div>
         </div>
+
         <button
           type="submit"
-          disabled={loading} // Disable tombol saat loading
-          className={`w-full ${loading ? 'bg-gray-400' : 'bg-green-500 hover:bg-green-600'} text-white font-semibold py-2 px-4 rounded-lg transition duration-300`}
+          disabled={loading}
+          className="w-full flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-2.5 px-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl active:scale-[0.98]"
         >
-          {loading ? "Logging in..." : "Login"}
+          {loading ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Logging in...
+            </>
+          ) : (
+            <>
+              <LogIn className="w-4 h-4" />
+              Login
+            </>
+          )}
         </button>
+
+        <div className="flex items-center justify-between mt-4 text-sm">
+          <Link
+            to="/register"
+            className="text-gray-500 hover:text-green-600 transition-colors"
+          >
+            Buat akun baru
+          </Link>
+          <Link
+            to="/forgot"
+            className="text-green-600 hover:text-green-700 font-medium transition-colors"
+          >
+            Lupa password?
+          </Link>
+        </div>
       </form>
     </div>
   );
-} 
+}
